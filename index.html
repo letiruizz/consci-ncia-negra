@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio Afro-Brasileiro</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #171717, #603516);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.caixa {
+    background: #fff;
+    color: #222;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px #0008;
+}
+
+h1 {
+    color: #9b531b;
+}
+
+.subtitulo {
+    color: #555;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #a65c20;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #713c18;
+    transform: scale(1.02);
+}
+
+.alternativa {
+    background: #eee;
+    color: #222;
+    border: 2px solid #ddd;
+}
+
+.alternativa:hover {
+    background: #f2d4a7;
+}
+
+#progresso {
+    color: #a65c20;
+    font-weight: bold;
+    margin: 20px;
+}
+
+#feedback {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#jogo, #final {
+    display: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="caixa">
+
+    <div id="inicio">
+        <h1>✊🏿 Desafio Afro-Brasileiro</h1>
+
+        <p class="subtitulo">
+            Conheça a história, a cultura e as personalidades
+            negras que marcaram o Brasil!
+        </p>
+
+        <h2>Você está preparado?</h2>
+
+        <button onclick="iniciar()">COMEÇAR JOGO</button>
+    </div>
+
+    <div id="jogo">
+
+        <h1>Desafio Afro-Brasileiro</h1>
+
+        <p id="progresso"></p>
+
+        <h2 id="pergunta"></h2>
+
+        <div id="opcoes"></div>
+
+        <p id="feedback"></p>
+
+        <button id="avancar" onclick="avancar()" style="display:none">
+            PRÓXIMA
+        </button>
+
+    </div>
+
+    <div id="final">
+        <h1>🏆 Fim do jogo!</h1>
+
+        <h2 id="resultado"></h2>
+
+        <p id="mensagemFinal"></p>
+
+        <button onclick="reiniciar()">JOGAR NOVAMENTE</button>
+    </div>
+
+</div>
+
+<script>
+
+const questoes = [
+    {
+        pergunta: "Quem foi Zumbi dos Palmares?",
+        opcoes: [
+            "Um escritor",
+            "Um líder quilombola",
+            "Um cantor",
+            "Um médico"
+        ],
+        resposta: 1
+    },
+
+    {
+        pergunta: "Em qual dia comemoramos a Consciência Negra?",
+        opcoes: [
+            "20 de novembro",
+            "7 de setembro",
+            "13 de maio",
+            "1 de janeiro"
+        ],
+        resposta: 0
+    },
+
+    {
+        pergunta: "O que era o Quilombo dos Palmares?",
+        opcoes: [
+            "Uma cidade portuguesa",
+            "Uma escola",
+            "Uma comunidade de resistência",
+            "Um palácio"
+        ],
+        resposta: 2
+    },
+
+    {
+        pergunta: "Quem escreveu Quarto de Despejo?",
+        opcoes: [
+            "Carolina Maria de Jesus",
+            "Machado de Assis",
+            "Monteiro Lobato",
+            "Clarice Lispector"
+        ],
+        resposta: 0
+    },
+
+    {
+        pergunta: "Qual manifestação cultural tem origem afro-brasileira?",
+        opcoes: [
+            "Capoeira",
+            "Flamenco",
+            "Valsa",
+            "Balé"
+        ],
+        resposta: 0
+    },
+
+    {
+        pergunta: "Quem foi Milton Santos?",
+        opcoes: [
+            "Engenheiro",
+            "Geógrafo",
+            "Ator",
+            "Jogador"
+        ],
+        resposta: 1
+    },
+
+    {
+        pergunta: "O que significa combater o racismo?",
+        opcoes: [
+            "Discriminar pessoas",
+            "Ignorar o preconceito",
+            "Promover respeito e igualdade",
+            "Excluir diferenças"
+        ],
+        resposta: 2
+    },
+
+    {
+        pergunta: "Quem foi Enedina Alves Marques?",
+        opcoes: [
+            "Uma escritora",
+            "Uma engenheira",
+            "Uma atriz",
+            "Uma cantora"
+        ],
+        resposta: 1
+    }
+];
+
+let numero = 0;
+let pontos = 0;
+let bloqueado = false;
+
+function iniciar() {
+    document.getElementById("inicio").style.display = "none";
+    document.getElementById("jogo").style.display = "block";
+    mostrarPergunta();
+}
+
+function mostrarPergunta() {
+
+    bloqueado = false;
+
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("avancar").style.display = "none";
+
+    document.getElementById("progresso").innerText =
+        "Pergunta " + (numero + 1) + " de " + questoes.length;
+
+    document.getElementById("pergunta").innerText =
+        questoes[numero].pergunta;
+
+    const opcoes = document.getElementById("opcoes");
+    opcoes.innerHTML = "";
+
+    questoes[numero].opcoes.forEach((texto, indice) => {
+
+        let botao = document.createElement("button");
+
+        botao.innerText = texto;
+        botao.className = "alternativa";
+
+        botao.onclick = function() {
+            verificar(indice);
+        };
+
+        opcoes.appendChild(botao);
+
+    });
+}
+
+function verificar(escolha) {
+
+    if (bloqueado) return;
+
+    bloqueado = true;
+
+    let correta = questoes[numero].resposta;
+    let botoes = document.querySelectorAll(".alternativa");
+
+    if (escolha === correta) {
+
+        pontos++;
+
+        document.getElementById("feedback").innerText =
+            "🎉 Muito bem! Resposta correta!";
+
+    } else {
+
+        document.getElementById("feedback").innerText =
+            "❌ Resposta incorreta! A correta é: " +
+            questoes[numero].opcoes[correta];
+
+    }
+
+    botoes[correta].style.background = "#45a049";
+    botoes[correta].style.color = "white";
+
+    if (escolha !== correta) {
+        botoes[escolha].style.background = "#d9534f";
+        botoes[escolha].style.color = "white";
+    }
+
+    document.getElementById("avancar").style.display = "block";
+}
+
+function avancar() {
+
+    numero++;
+
+    if (numero < questoes.length) {
+        mostrarPergunta();
+    } else {
+        terminar();
+    }
+}
+
+function terminar() {
+
+    document.getElementById("jogo").style.display = "none";
+    document.getElementById("final").style.display = "block";
+
+    document.getElementById("resultado").innerText =
+        "Você fez " + pontos + " de " + questoes.length + " pontos!";
+
+    let mensagem = "";
+
+    if (pontos === questoes.length) {
+        mensagem = "Excelente! Você acertou todas as perguntas!";
+    } else if (pontos >= 5) {
+        mensagem = "Muito bem! Você conhece bastante sobre o tema!";
+    } else {
+        mensagem = "Continue aprendendo sobre a história afro-brasileira!";
+    }
+
+    document.getElementById("mensagemFinal").innerText = mensagem;
+}
+
+function reiniciar() {
+
+    numero = 0;
+    pontos = 0;
+
+    document.getElementById("final").style.display = "none";
+    document.getElementById("inicio").style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
